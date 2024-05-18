@@ -38,6 +38,61 @@ module "radar_runtask" {
 }
 
 #####################################################################################
+# HCP Terraform configuration
+#####################################################################################
+
+data "tfe_organization" "hcp_tf_org" {
+  name = var.hcp_tf_org_name
+}
+
+resource "tfe_organization_run_task" "hcp_tf_org_run_task" {
+  organization = data.tfe_organization.hcp_tf_org.name
+  url          = module.radar_runtask.runtask_url
+  name         = var.run_task_name
+  enabled      = true
+  description  = "HCP Radar run task to scan for secrets and keys in Terraform configurations"
+}
+
+resource "tfe_workspace" "run_task_workspace" {
+  organization = data.tfe_organization.hcp_tf_org.name
+  name         = var.hcp_tf_workspace_name
+  auto_apply   = true
+}
+
+resource "tfe_workspace_run_task" "pre_radar_runtask" {
+  workspace_id      = tfe_workspace.run_task_workspace.id
+  task_id           = tfe_organization_run_task.hcp_tf_org_run_task.id
+  enforcement_level = var.run_task_enforcement_level
+  stage             = "pre_plan"
+}
+
+# Run shell commands using Terraform
+# convert to template file pattern
+resource "null_resource" "shell_commands" {
+  provisioner "local-exec" {
+    command = <<EOT
+      echo "
+  terraform {
+    cloud {
+      organization = \"${data.tfe_organization.hcp_tf_org.name}\"
+
+      workspaces {
+        name = \"${tfe_workspace.run_task_workspace.name}\"
+      }
+    }
+    required_providers {
+      pinecone = {
+        source = \"pinecone-io/pinecone\"
+      }
+    }
+  }" >> sample/main.tf
+      cd sample && terraform init && terraform plan &
+    EOT
+  }
+  depends_on = [ tfe_workspace_run_task.pre_radar_runtask ]
+}
+
+#####################################################################################
 # VPC
 #####################################################################################
 
