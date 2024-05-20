@@ -26,8 +26,14 @@ variable "hcp_tf_workspace_name" {
 
 variable "run_task_name" {
   type        = string
-  description = "The name of the run task"  
+  description = "The name of the run task"
   default     = "hcp-radar-runtask"
+}
+
+variable "hmac_key" {
+  type        = string
+  description = "The HMAC key for the run task"
+  default     = "abc123"
 }
 
 variable "run_task_enforcement_level" {

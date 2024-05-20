@@ -80,10 +80,6 @@ def download_config(configuration_version_download_url, access_token):
 
     os.remove(config_file)
 
-    # Somehow the scan.csv file is being added, so we need to remove it
-    extra_file = os.path.join(os.getcwd(), "pre_plan", "scan.csv")
-    os.remove(extra_file)
-
 
 def validate_hmac(request):
     hmac_key = os.environ.get("HMAC_KEY", "abc123")

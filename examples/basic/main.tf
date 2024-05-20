@@ -49,6 +49,7 @@ resource "tfe_organization_run_task" "hcp_tf_org_run_task" {
   organization = data.tfe_organization.hcp_tf_org.name
   url          = module.radar_runtask.runtask_url
   name         = var.run_task_name
+  hmac_key     = var.hmac_key
   enabled      = true
   description  = "HCP Radar run task to scan for secrets and keys in Terraform configurations"
 }
@@ -68,28 +69,24 @@ resource "tfe_workspace_run_task" "pre_radar_runtask" {
 
 # Run shell commands using Terraform
 # convert to template file pattern
-resource "null_resource" "shell_commands" {
-  provisioner "local-exec" {
-    command = <<EOT
-      echo "
-  terraform {
-    cloud {
-      organization = \"${data.tfe_organization.hcp_tf_org.name}\"
+# Create a new file from the template with variables
+resource "local_file" "template_file" {
+  filename = "${path.module}/sample/providers.tf"
+  content = templatefile("${path.module}/sample/providers.tftpl", {
+    organization_name = data.tfe_organization.hcp_tf_org.name,
+    workspace_name    = tfe_workspace.run_task_workspace.name
+  })
+  depends_on = [tfe_workspace_run_task.pre_radar_runtask]
+}
 
-      workspaces {
-        name = \"${tfe_workspace.run_task_workspace.name}\"
-      }
-    }
-    required_providers {
-      pinecone = {
-        source = \"pinecone-io/pinecone\"
-      }
-    }
-  }" >> sample/main.tf
-      cd sample && terraform init && terraform plan &
-    EOT
+resource "null_resource" "run_tf" {
+  provisioner "local-exec" {
+    command = "cd ${path.module}/sample && terraform init && terraform plan"
   }
-  depends_on = [ tfe_workspace_run_task.pre_radar_runtask ]
+
+  triggers = {
+    file_content = filemd5("${path.module}/main.tf")
+  }
 }
 
 #####################################################################################

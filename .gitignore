@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+examples/basic/sample/providers.tf
 
 # Locally dowloaded folders
 app/post_plan/
