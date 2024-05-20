@@ -261,7 +261,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_role_policy_attachment" {
 
 
 #####################################################################################
-# API Gateway 
+# API Gateway
 # Refer: https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-private-integration.html
 #####################################################################################
 

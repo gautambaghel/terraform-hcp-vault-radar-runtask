@@ -1,0 +1,33 @@
+formatter: markdown
+settings:
+  anchor: true
+  color: true
+  default: true
+  escape: true
+  html: true
+  indent: 2
+  required: true
+  sensitive: true
+  type: true
+
+sort:
+  enabled: true
+  by: required
+
+output:
+  file: README.md
+  mode: inject
+  template: |-
+    <!-- BEGIN_TF_DOCS -->
+    {{ .Content }}
+    <!-- END_TF_DOCS -->
+
+# see https://terraform-docs.io/user-guide/configuration/sections/
+sections:
+  show:
+    - inputs
+    - outputs
+    - requirements
+    - providers
+    - resources
+    - providers
