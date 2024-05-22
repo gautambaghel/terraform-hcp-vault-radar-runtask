@@ -6,10 +6,16 @@
 
 data "aws_availability_zones" "available" {}
 
+resource "random_string" "suffix" {
+  length  = 4
+  special = false
+  upper   = false
+}
+
 locals {
   region   = "us-west-2"
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
-  name     = "hcp-radar"
+  name     = var.randomize_name ? "${var.name}-${random_string.suffix.result}" : var.name
   vpc_cidr = "10.0.0.0/16"
   tags = {
     Terraform   = "true"
@@ -87,6 +93,8 @@ resource "null_resource" "run_tf" {
   triggers = {
     file_content = filemd5("${path.module}/main.tf")
   }
+
+  depends_on = [local_file.template_file]
 }
 
 #####################################################################################

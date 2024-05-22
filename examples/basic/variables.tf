@@ -18,6 +18,18 @@ variable "hcp_tf_org_name" {
   description = "The name of the HCP Terraform organization to create the run task"
 }
 
+variable "randomize_name" {
+  type        = bool
+  description = "Whether to randomize the name of the resources"
+  default     = true
+}
+
+variable "name" {
+  type        = string
+  description = "A name to apply to resources. The name must be unique within an AWS account"
+  default     = "hcp-radar"
+}
+
 variable "hcp_tf_workspace_name" {
   type        = string
   description = "The name of the HCP Terraform workspace to attach the run task"
