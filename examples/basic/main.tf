@@ -17,6 +17,7 @@ locals {
   azs            = slice(data.aws_availability_zones.available.names, 0, 3)
   name           = var.randomize_name ? "${var.name}-${random_string.suffix.result}" : var.name
   workspace_name = var.randomize_name ? "${var.hcp_tf_workspace_name}-${random_string.suffix.result}" : var.hcp_tf_workspace_name
+  run_task_name  = var.randomize_name ? "${var.run_task_name}-${random_string.suffix.result}" : var.run_task_name
   vpc_cidr       = "10.0.0.0/16"
   tags = {
     Terraform   = "true"
@@ -55,7 +56,7 @@ data "tfe_organization" "hcp_tf_org" {
 resource "tfe_organization_run_task" "hcp_tf_org_run_task" {
   organization = data.tfe_organization.hcp_tf_org.name
   url          = module.radar_runtask.runtask_url
-  name         = var.run_task_name
+  name         = local.run_task_name
   hmac_key     = var.hmac_key
   enabled      = true
   description  = "HCP Radar run task to scan for secrets and keys in Terraform configurations"
@@ -63,7 +64,7 @@ resource "tfe_organization_run_task" "hcp_tf_org_run_task" {
 
 resource "tfe_workspace" "run_task_workspace" {
   organization = data.tfe_organization.hcp_tf_org.name
-  name         = var.hcp_tf_workspace_name
+  name         = local.workspace_name
   auto_apply   = true
 }
 
