@@ -47,5 +47,9 @@
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_hcp_tf_org_name"></a> [hcp\_tf\_org\_name](#output\_hcp\_tf\_org\_name) | The name of the HCP Terraform organization |
+| <a name="output_hcp_tf_workspace_name"></a> [hcp\_tf\_workspace\_name](#output\_hcp\_tf\_workspace\_name) | The name of the HCP Terraform workspace with attached run task |
+| <a name="output_run_task_url"></a> [run\_task\_url](#output\_run\_task\_url) | The URL of the run task |
 <!-- END_TF_DOCS -->

@@ -91,13 +91,12 @@ resource "local_file" "template_file" {
 resource "null_resource" "run_tf" {
   provisioner "local-exec" {
     command = <<EOF
-      cd ${path.module}/sample
       if which terraform >/dev/null 2>&1; then
-        $(which terraform) init
-        $(which terraform) plan
+        $(which terraform) -chdir=${path.module}/sample init
+        $(which terraform) -chdir=${path.module}/sample plan
       else
-        ../bin/terraform init
-        ../bin/terraform plan
+        ../bin/terraform -chdir=${path.module}/sample init
+        ../bin/terraform -chdir=${path.module}/sample plan
       fi
     EOF
   }
