@@ -24,6 +24,14 @@ terraform plan
 terraform apply
 ```
 
+Try to run Terraform plan on a sample config with API exposed with the run task attached
+
+```sh
+cd sample
+terraform init
+terraform plan
+```
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

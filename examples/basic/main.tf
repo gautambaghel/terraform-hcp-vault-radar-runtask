@@ -87,17 +87,18 @@ resource "local_file" "template_file" {
   depends_on = [tfe_workspace_run_task.pre_radar_runtask]
 }
 
-resource "null_resource" "run_tf" {
-  provisioner "local-exec" {
-    command = "cd ${path.module}/sample && $(which terraform) init && $(which terraform) plan"
-  }
+# Use HCP Terraform run triggers to invoke Terraform on secondary configuration
+# resource "null_resource" "run_tf" {
+#   provisioner "local-exec" {
+#     command = "cd ${path.module}/sample && $(which terraform) init && $(which terraform) plan"
+#   }
 
-  triggers = {
-    file_content = filemd5("${path.module}/main.tf")
-  }
+#   triggers = {
+#     file_content = filemd5("${path.module}/main.tf")
+#   }
 
-  depends_on = [local_file.template_file]
-}
+#   depends_on = [local_file.template_file]
+# }
 
 #####################################################################################
 # VPC
