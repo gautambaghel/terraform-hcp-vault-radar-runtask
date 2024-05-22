@@ -13,10 +13,11 @@ resource "random_string" "suffix" {
 }
 
 locals {
-  region   = "us-west-2"
-  azs      = slice(data.aws_availability_zones.available.names, 0, 3)
-  name     = var.randomize_name ? "${var.name}-${random_string.suffix.result}" : var.name
-  vpc_cidr = "10.0.0.0/16"
+  region         = "us-west-2"
+  azs            = slice(data.aws_availability_zones.available.names, 0, 3)
+  name           = var.randomize_name ? "${var.name}-${random_string.suffix.result}" : var.name
+  workspace_name = var.randomize_name ? "${var.hcp_tf_workspace_name}-${random_string.suffix.result}" : var.hcp_tf_workspace_name
+  vpc_cidr       = "10.0.0.0/16"
   tags = {
     Terraform   = "true"
     Environment = "dev"

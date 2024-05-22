@@ -179,7 +179,7 @@ moved {
 }
 
 resource "aws_security_group" "hcp_vault_radar" {
-  name_prefix = "sg-${local.name}"
+  name_prefix = "${local.name}-sg"
   description = "Security group for HCP Vault Radar: ${local.name}"
   vpc_id      = var.vpc_id
   lifecycle {
