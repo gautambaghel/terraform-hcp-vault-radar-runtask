@@ -24,10 +24,19 @@ terraform plan
 terraform apply
 ```
 
-Try to run Terraform plan on a sample config with API exposed with the run task attached
+Copy the workspace name and organization name and paste it in the sample/providers.tf file
+
+```sh
+# can be done manually as well
+sed -i '' "s/organization_name/$(terraform output -raw hcp_tf_org_name | sed 's/\//\\\//g')/g" sample/providers.tf
+sed -i '' "s/workspace_name/$(terraform output -raw hcp_tf_workspace_name | sed 's/\//\\\//g')/g" sample/providers.tf
+```
+
+Try to run Terraform plan on a sample config with a dummy API key exposed to make sure integration works
 
 ```sh
 cd sample
+
 terraform init
 terraform plan
 ```

@@ -75,39 +75,6 @@ resource "tfe_workspace_run_task" "pre_radar_runtask" {
   stage             = "pre_plan"
 }
 
-# Run shell commands using Terraform
-# convert to template file pattern
-# Create a new file from the template with variables
-resource "local_file" "template_file" {
-  filename = "${path.module}/sample/providers.tf"
-  content = templatefile("${path.module}/sample/providers.tftpl", {
-    organization_name = data.tfe_organization.hcp_tf_org.name,
-    workspace_name    = tfe_workspace.run_task_workspace.name
-  })
-  depends_on = [tfe_workspace_run_task.pre_radar_runtask]
-}
-
-# Use HCP Terraform run triggers to invoke Terraform on secondary configuration
-resource "null_resource" "run_tf" {
-  provisioner "local-exec" {
-    command = <<EOF
-      if which terraform >/dev/null 2>&1; then
-        $(which terraform) -chdir=${path.module}/sample init
-        $(which terraform) -chdir=${path.module}/sample plan
-      else
-        ../bin/terraform -chdir=${path.module}/sample init
-        ../bin/terraform -chdir=${path.module}/sample plan
-      fi
-    EOF
-  }
-
-  triggers = {
-    file_content = filemd5("${path.module}/main.tf")
-  }
-
-  depends_on = [local_file.template_file]
-}
-
 #####################################################################################
 # VPC
 #####################################################################################
