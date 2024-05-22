@@ -3,6 +3,12 @@ variable "name" {
   description = "A name to apply to resources. The name must be unique within an AWS account."
 }
 
+variable "randomize_name" {
+  type        = bool
+  description = "Whether to randomize the name of the resources."
+  default     = true
+}
+
 variable "hcp_project_id" {
   type        = string
   description = "The ID of the HCP project to use."

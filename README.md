@@ -15,8 +15,10 @@ The repository is setup as a typical Terraform module structure, here's the fold
 
 ## Getting started
 
+Create the necessary infrastructure
+
 ```sh
-cd examples/basic
+cd examples/basic/
 terraform init
 terraform plan
 terraform apply
@@ -37,6 +39,7 @@ terraform apply
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.47.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | n/a |
 
 ## Resources
 
@@ -58,6 +61,7 @@ terraform apply
 | [aws_ssm_parameter.hcp_client_id](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
 | [aws_ssm_parameter.hcp_client_secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
 | [aws_ssm_parameter.hcp_project_id](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
+| [random_string.suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 
 ## Inputs
 
@@ -80,6 +84,7 @@ terraform apply
 | <a name="input_radar_egress_ports"></a> [radar\_egress\_ports](#input\_radar\_egress\_ports) | Egress ports to allow the agent to communicate with the HCP Vault Radar. | `set(string)` | <pre>[<br>  "0"<br>]</pre> | no |
 | <a name="input_radar_ingress_ports"></a> [radar\_ingress\_ports](#input\_radar\_ingress\_ports) | Ingress ports to allow the agent to communicate with the HCP Vault Radar. | `set(string)` | <pre>[<br>  "80"<br>]</pre> | no |
 | <a name="input_radar_runtask_image"></a> [radar\_runtask\_image](#input\_radar\_runtask\_image) | The Docker image with Terraform runtask server & Radar installed. | `string` | `"baghelg/hcp-radar-runtask:latest"` | no |
+| <a name="input_randomize_name"></a> [randomize\_name](#input\_randomize\_name) | Whether to randomize the name of the resources. | `bool` | `true` | no |
 | <a name="input_task_policy_arns"></a> [task\_policy\_arns](#input\_task\_policy\_arns) | ARN(s) of IAM policies to attach to the agent task. Determines what actions the agent can take without requiring additional AWS credentials. | `list(string)` | `[]` | no |
 | <a name="input_use_spot_instances"></a> [use\_spot\_instances](#input\_use\_spot\_instances) | Whether to use Fargate Spot instances. | `bool` | `false` | no |
 

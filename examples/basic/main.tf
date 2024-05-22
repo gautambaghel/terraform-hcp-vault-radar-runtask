@@ -81,7 +81,7 @@ resource "local_file" "template_file" {
 
 resource "null_resource" "run_tf" {
   provisioner "local-exec" {
-    command = "cd ${path.module}/sample && terraform init && terraform plan"
+    command = "cd ${path.module}/sample && $(which terraform) init && $(which terraform) plan"
   }
 
   triggers = {

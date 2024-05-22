@@ -1,28 +1,38 @@
 data "aws_region" "current" {}
 
+resource "random_string" "suffix" {
+  length  = 4
+  special = false
+  upper   = false
+}
+
+locals {
+  name = var.randomize_name ? "${var.name}-${random_string.suffix.result}" : var.name
+}
+
 resource "aws_ssm_parameter" "hcp_project_id" {
-  name        = "/hcp-vault-radar/hcp-project-id/${var.name}"
+  name        = "/hcp-vault-radar/hcp-project-id/${local.name}"
   description = "HCP Project Id"
   type        = "SecureString"
   value       = var.hcp_project_id
 }
 
 resource "aws_ssm_parameter" "hcp_client_id" {
-  name        = "/hcp-vault-radar/hcp-client-id/${var.name}"
+  name        = "/hcp-vault-radar/hcp-client-id/${local.name}"
   description = "HCP Client Id"
   type        = "SecureString"
   value       = var.hcp_client_id
 }
 
 resource "aws_ssm_parameter" "hcp_client_secret" {
-  name        = "/hcp-vault-radar/hcp-client-secret/${var.name}"
+  name        = "/hcp-vault-radar/hcp-client-secret/${local.name}"
   description = "HCP Client Secret"
   type        = "SecureString"
   value       = var.hcp_client_secret
 }
 
 resource "aws_ecs_task_definition" "hcp_vault_radar" {
-  family                   = "hcp-vault-radar-${var.name}"
+  family                   = local.name
   cpu                      = var.ecs_cpu
   memory                   = var.ecs_memory
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
@@ -47,7 +57,7 @@ resource "aws_ecs_task_definition" "hcp_vault_radar" {
             awslogs-create-group : "true",
             awslogs-group : var.cloudwatch_log_group_name
             awslogs-region : data.aws_region.current.name
-            awslogs-stream-prefix : "hcp-vault-radar-${var.name}"
+            awslogs-stream-prefix : "${local.name}"
           }
         }
         portMappings : [
@@ -82,7 +92,7 @@ resource "aws_ecs_task_definition" "hcp_vault_radar" {
 }
 
 resource "aws_ecs_service" "hcp_vault_radar" {
-  name            = "hcp-vault-radar-${var.name}"
+  name            = local.name
   cluster         = var.ecs_cluster_arn
   task_definition = aws_ecs_task_definition.hcp_vault_radar.arn
   desired_count   = var.ecs_desired_count
@@ -118,12 +128,12 @@ resource "aws_ecs_service" "hcp_vault_radar" {
   }
 
   tags = {
-    Name = "hcp-vault-radar-${var.name}"
+    Name = "${local.name}"
   }
 }
 
 resource "aws_lb_target_group" "hcp_vault_radar" {
-  name        = "hcp-vault-radar-${var.name}"
+  name        = local.name
   vpc_id      = var.vpc_id
   port        = 80
   protocol    = "HTTP"
@@ -153,13 +163,13 @@ resource "aws_lb_listener" "hcp_vault_radar" {
 }
 
 resource "aws_lb" "hcp_vault_radar" {
-  name               = "hcp-vault-radar-${var.name}"
+  name               = local.name
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.hcp_vault_radar.id]
   subnets            = var.subnet_ids
   tags = {
-    Name = "hcp-vault-radar-${var.name}"
+    Name = "${local.name}"
   }
 }
 
@@ -169,8 +179,8 @@ moved {
 }
 
 resource "aws_security_group" "hcp_vault_radar" {
-  name_prefix = "hcp-vault-radar-${var.name}-sg"
-  description = "Security group for HCP Vault Radar: ${var.name}"
+  name_prefix = "sg-${local.name}"
+  description = "Security group for HCP Vault Radar: ${local.name}"
   vpc_id      = var.vpc_id
   lifecycle {
     create_before_destroy = true
@@ -214,10 +224,10 @@ data "aws_iam_policy_document" "radar_assume_role_policy" {
 }
 
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name               = "${var.name}-ecsTaskExecutionRole"
+  name               = "${local.name}-ecsTaskExecutionRole"
   assume_role_policy = data.aws_iam_policy_document.radar_assume_role_policy.json
   tags = {
-    Name = "hcp-vault-radar-${var.name}-ecsTaskExecutionRole"
+    Name = "${local.name}-ecsTaskExecutionRole"
   }
 }
 
@@ -245,10 +255,10 @@ resource "aws_iam_role_policy" "radar_init_policy" {
 }
 
 resource "aws_iam_role" "ecs_task_role" {
-  name               = "${var.name}-ecsTaskRole"
+  name               = "${local.name}-ecsTaskRole"
   assume_role_policy = data.aws_iam_policy_document.radar_assume_role_policy.json
   tags = {
-    Name = "hcp-vault-radar-${var.name}-ecsTaskRole"
+    Name = "${local.name}-ecsTaskRole"
   }
 }
 
@@ -266,7 +276,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_role_policy_attachment" {
 #####################################################################################
 
 # resource "aws_apigatewayv2_vpc_link" "private_integration_vpc_link" {
-#   name               = "hcp-vault-radar-vpc-link-${var.name}"
+#   name               = local.name
 #   security_group_ids = [aws_security_group.hcp_vault_radar.id]
 #   subnet_ids         = var.subnet_ids
 
@@ -276,7 +286,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_role_policy_attachment" {
 # }
 
 # resource "aws_apigatewayv2_api" "http_api" {
-#   name          = "hcp-vault-radar-api-${var.name}"
+#   name          = local.name
 #   protocol_type = "HTTP"
 #   description   = "HTTP API for HCP Vault Radar run task"
 
