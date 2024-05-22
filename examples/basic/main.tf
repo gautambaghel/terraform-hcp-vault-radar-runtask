@@ -88,17 +88,26 @@ resource "local_file" "template_file" {
 }
 
 # Use HCP Terraform run triggers to invoke Terraform on secondary configuration
-# resource "null_resource" "run_tf" {
-#   provisioner "local-exec" {
-#     command = "cd ${path.module}/sample && $(which terraform) init && $(which terraform) plan"
-#   }
+resource "null_resource" "run_tf" {
+  provisioner "local-exec" {
+    command = <<EOF
+      cd ${path.module}/sample
+      if which terraform >/dev/null 2>&1; then
+        $(which terraform) init
+        $(which terraform) plan
+      else
+        ../bin/terraform init
+        ../bin/terraform plan
+      fi
+    EOF
+  }
 
-#   triggers = {
-#     file_content = filemd5("${path.module}/main.tf")
-#   }
+  triggers = {
+    file_content = filemd5("${path.module}/main.tf")
+  }
 
-#   depends_on = [local_file.template_file]
-# }
+  depends_on = [local_file.template_file]
+}
 
 #####################################################################################
 # VPC
