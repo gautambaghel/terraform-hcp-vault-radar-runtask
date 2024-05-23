@@ -30,7 +30,8 @@ locals {
 #####################################################################################
 
 module "radar_runtask" {
-  source                    = "../../"
+  source                    = "gautambaghel/vault-radar-runtask/hcp"
+  version                   = "1.0.0-alpha"
   name                      = local.name
   hcp_client_id             = var.hcp_client_id
   hcp_client_secret         = var.hcp_client_secret
